@@ -47,39 +47,40 @@
 #define CTRL_H_STR      "\010"
 #define CTRL_V_STR      "\026"
 
-#define Ctrl_AT         0   /* @ */
-#define Ctrl_A          1
-#define Ctrl_B          2
-#define Ctrl_C          3
-#define Ctrl_D          4
-#define Ctrl_E          5
-#define Ctrl_F          6
-#define Ctrl_G          7
-#define Ctrl_H          8
-#define Ctrl_I          9
-#define Ctrl_J          10
-#define Ctrl_K          11
-#define Ctrl_L          12
-#define Ctrl_M          13
-#define Ctrl_N          14
-#define Ctrl_O          15
-#define Ctrl_P          16
-#define Ctrl_Q          17
-#define Ctrl_R          18
-#define Ctrl_S          19
-#define Ctrl_T          20
-#define Ctrl_U          21
-#define Ctrl_V          22
-#define Ctrl_W          23
-#define Ctrl_X          24
-#define Ctrl_Y          25
-#define Ctrl_Z          26
-/* CTRL- [ Left Square Bracket == ESC*/
-#define Ctrl_BSL        28  /* \ BackSLash */
-#define Ctrl_RSB        29  /* ] Right Square Bracket */
-#define Ctrl_HAT        30  /* ^ */
-#define Ctrl__          31
-
+enum CtrlChar {
+  Ctrl_AT,  /* @ */
+  Ctrl_A,
+  Ctrl_B,
+  Ctrl_C,
+  Ctrl_D,
+  Ctrl_E,
+  Ctrl_F,
+  Ctrl_G,
+  Ctrl_H,
+  Ctrl_I,
+  Ctrl_J,
+  Ctrl_K,
+  Ctrl_L,
+  Ctrl_M,
+  Ctrl_N,
+  Ctrl_O,
+  Ctrl_P,
+  Ctrl_Q,
+  Ctrl_R,
+  Ctrl_S,
+  Ctrl_T,
+  Ctrl_U,
+  Ctrl_V,
+  Ctrl_W,
+  Ctrl_X,
+  Ctrl_Y,
+  Ctrl_Z,
+  /* CTRL- [ Left Square Bracket == ESC*/
+  Ctrl_BSL = 28,  /* \ BackSLash */
+  Ctrl_RSB,       /* ] Right Square Bracket */
+  Ctrl_HAT,       /* ^ */
+  Ctrl__
+};
 
 /*
  * Character that separates dir names in a path.
