@@ -151,6 +151,8 @@ extern char_u *(term_strings[]);    /* current terminal strings */
 #define T_OP    (term_str(KS_OP))       /* original color pair */
 #define T_U7    (term_str(KS_U7))       /* request cursor position */
 
-#define TMODE_COOK  0   /* terminal mode for external cmds and Ex mode */
-#define TMODE_SLEEP 1   /* terminal mode for sleeping (cooked but no echo) */
-#define TMODE_RAW   2   /* terminal mode for Normal and Insert mode */
+enum TerminalMode {
+  TMODE_COOK,    /* terminal mode for external cmds and Ex mode */
+  TMODE_SLEEP,   /* terminal mode for sleeping (cooked but no echo) */
+  TMODE_RAW      /* terminal mode for Normal and Insert mode */
+};
