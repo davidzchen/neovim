@@ -210,14 +210,16 @@ typedef unsigned long u8char_T;     /* long should be 32 bits or more */
  * flags for update_screen()
  * The higher the value, the higher the priority
  */
-#define VALID                   10  /* buffer not changed, or changes marked
-                                       with b_mod_* */
-#define INVERTED                20  /* redisplay inverted part that changed */
-#define INVERTED_ALL            25  /* redisplay whole inverted part */
-#define REDRAW_TOP              30  /* display first w_upd_rows screen lines */
-#define SOME_VALID              35  /* like NOT_VALID but may scroll */
-#define NOT_VALID               40  /* buffer needs complete redraw */
-#define CLEAR                   50  /* screen messed up, clear it */
+enum RedrawType {
+  VALID        = 10,  /* buffer not changed, or changes marked
+                         with b_mod_* */
+  INVERTED     = 20,  /* redisplay inverted part that changed */
+  INVERTED_ALL = 25,  /* redisplay whole inverted part */
+  REDRAW_TOP   = 30,  /* display first w_upd_rows screen lines */
+  SOME_VALID   = 35,  /* like NOT_VALID but may scroll */
+  NOT_VALID    = 40,  /* buffer needs complete redraw */
+  CLEAR        = 50   /* screen messed up, clear it */
+};
 
 /*
  * Flags for w_valid.
@@ -233,32 +235,36 @@ typedef unsigned long u8char_T;     /* long should be 32 bits or more */
  * functions that set or reset the flags.
  *
  * VALID_BOTLINE    VALID_BOTLINE_AP
- *     on		on		w_botline valid
- *     off		on		w_botline approximated
- *     off		off		w_botline not valid
- *     on		off		not possible
+ *     on           on    w_botline valid
+ *     off          on    w_botline approximated
+ *     off          off   w_botline not valid
+ *     on           off   not possible
  */
-#define VALID_WROW      0x01    /* w_wrow (window row) is valid */
-#define VALID_WCOL      0x02    /* w_wcol (window col) is valid */
-#define VALID_VIRTCOL   0x04    /* w_virtcol (file col) is valid */
-#define VALID_CHEIGHT   0x08    /* w_cline_height and w_cline_folded valid */
-#define VALID_CROW      0x10    /* w_cline_row is valid */
-#define VALID_BOTLINE   0x20    /* w_botine and w_empty_rows are valid */
-#define VALID_BOTLINE_AP 0x40   /* w_botine is approximated */
-#define VALID_TOPLINE   0x80    /* w_topline is valid (for cursor position) */
+enum WindowValidFlag {
+  VALID_WROW       = 0x01,   /* w_wrow (window row) is valid */
+  VALID_WCOL       = 0x02,   /* w_wcol (window col) is valid */
+  VALID_VIRTCOL    = 0x04,   /* w_virtcol (file col) is valid */
+  VALID_CHEIGHT    = 0x08,   /* w_cline_height and w_cline_folded valid */
+  VALID_CROW       = 0x10,   /* w_cline_row is valid */
+  VALID_BOTLINE    = 0x20,   /* w_botine and w_empty_rows are valid */
+  VALID_BOTLINE_AP = 0x40,   /* w_botine is approximated */
+  VALID_TOPLINE    = 0x80    /* w_topline is valid (for cursor position) */
+};
 
 /*
  * Terminal highlighting attribute bits.
  * Attributes above HL_ALL are used for syntax highlighting.
  */
-#define HL_NORMAL               0x00
-#define HL_INVERSE              0x01
-#define HL_BOLD                 0x02
-#define HL_ITALIC               0x04
-#define HL_UNDERLINE            0x08
-#define HL_UNDERCURL            0x10
-#define HL_STANDOUT             0x20
-#define HL_ALL                  0x3f
+enum HlAttributeFlag {
+  HL_NORMAL         = 0x00,
+  HL_INVERSE        = 0x01,
+  HL_BOLD           = 0x02,
+  HL_ITALIC         = 0x04,
+  HL_UNDERLINE      = 0x08,
+  HL_UNDERCURL      = 0x10,
+  HL_STANDOUT       = 0x20,
+  HL_ALL            = 0x3f
+};
 
 /* special attribute addition: Put message in history */
 #define MSG_HIST                0x1000
@@ -314,139 +320,157 @@ typedef unsigned long u8char_T;     /* long should be 32 bits or more */
 #define NOTDONE                 2   /* not OK or FAIL but skipped */
 
 /* flags for b_flags */
-#define BF_RECOVERED    0x01    /* buffer has been recovered */
-#define BF_CHECK_RO     0x02    /* need to check readonly when loading file
-                                   into buffer (set by ":e", may be reset by
-                                   ":buf" */
-#define BF_NEVERLOADED  0x04    /* file has never been loaded into buffer,
-                                   many variables still need to be set */
-#define BF_NOTEDITED    0x08    /* Set when file name is changed after
-                                   starting to edit, reset when file is
-                                   written out. */
-#define BF_NEW          0x10    /* file didn't exist when editing started */
-#define BF_NEW_W        0x20    /* Warned for BF_NEW and file created */
-#define BF_READERR      0x40    /* got errors while reading the file */
-#define BF_DUMMY        0x80    /* dummy buffer, only used internally */
-#define BF_PRESERVED    0x100   /* ":preserve" was used */
+enum BufferFlag {
+  BF_RECOVERED    = 0x01,    /* buffer has been recovered */
+  BF_CHECK_RO     = 0x02,    /* need to check readonly when loading file
+                             into buffer (set by ":e", may be reset by
+                             ":buf" */
+  BF_NEVERLOADED  = 0x04,    /* file has never been loaded into buffer,
+                             many variables still need to be set */
+  BF_NOTEDITED    = 0x08,    /* Set when file name is changed after
+                             starting to edit, reset when file is
+                             written out. */
+  BF_NEW          = 0x10,    /* file didn't exist when editing started */
+  BF_NEW_W        = 0x20,    /* Warned for BF_NEW and file created */
+  BF_READERR      = 0x40,    /* got errors while reading the file */
+  BF_DUMMY        = 0x80,    /* dummy buffer, only used internally */
+  BF_PRESERVED    = 0x100,    /* ":preserve" was used */
+  BF_WRITE_MASK   = (BF_NOTEDITED + BF_NEW + BF_READERR)
+};
 
 /* Mask to check for flags that prevent normal writing */
-#define BF_WRITE_MASK   (BF_NOTEDITED + BF_NEW + BF_READERR)
 
 /*
  * values for xp_context when doing command line completion
  */
-#define EXPAND_UNSUCCESSFUL     (-2)
-#define EXPAND_OK               (-1)
-#define EXPAND_NOTHING          0
-#define EXPAND_COMMANDS         1
-#define EXPAND_FILES            2
-#define EXPAND_DIRECTORIES      3
-#define EXPAND_SETTINGS         4
-#define EXPAND_BOOL_SETTINGS    5
-#define EXPAND_TAGS             6
-#define EXPAND_OLD_SETTING      7
-#define EXPAND_HELP             8
-#define EXPAND_BUFFERS          9
-#define EXPAND_EVENTS           10
-#define EXPAND_MENUS            11
-#define EXPAND_SYNTAX           12
-#define EXPAND_HIGHLIGHT        13
-#define EXPAND_AUGROUP          14
-#define EXPAND_USER_VARS        15
-#define EXPAND_MAPPINGS         16
-#define EXPAND_TAGS_LISTFILES   17
-#define EXPAND_FUNCTIONS        18
-#define EXPAND_USER_FUNC        19
-#define EXPAND_EXPRESSION       20
-#define EXPAND_MENUNAMES        21
-#define EXPAND_USER_COMMANDS    22
-#define EXPAND_USER_CMD_FLAGS   23
-#define EXPAND_USER_NARGS       24
-#define EXPAND_USER_COMPLETE    25
-#define EXPAND_ENV_VARS         26
-#define EXPAND_LANGUAGE         27
-#define EXPAND_COLORS           28
-#define EXPAND_COMPILER         29
-#define EXPAND_USER_DEFINED     30
-#define EXPAND_USER_LIST        31
-#define EXPAND_SHELLCMD         32
-#define EXPAND_CSCOPE           33
-#define EXPAND_SIGN             34
-#define EXPAND_PROFILE          35
-#define EXPAND_BEHAVE           36
-#define EXPAND_FILETYPE         37
-#define EXPAND_FILES_IN_PATH    38
-#define EXPAND_OWNSYNTAX        39
-#define EXPAND_LOCALES          40
-#define EXPAND_HISTORY          41
-#define EXPAND_USER             42
-#define EXPAND_SYNTIME          43
+enum ExpandValues {
+  EXPAND_UNSUCCESSFUL = -2,
+  EXPAND_OK = -1,
+  EXPAND_NOTHING = 0,
+  EXPAND_COMMANDS,
+  EXPAND_FILES,
+  EXPAND_DIRECTORIES,
+  EXPAND_SETTINGS,
+  EXPAND_BOOL_SETTINGS,
+  EXPAND_TAGS,
+  EXPAND_OLD_SETTING,
+  EXPAND_HELP,
+  EXPAND_BUFFERS,
+  EXPAND_EVENTS,
+  EXPAND_MENUS,
+  EXPAND_SYNTAX,
+  EXPAND_HIGHLIGHT,
+  EXPAND_AUGROUP,
+  EXPAND_USER_VARS,
+  EXPAND_MAPPINGS,
+  EXPAND_TAGS_LISTFILES,
+  EXPAND_FUNCTIONS,
+  EXPAND_USER_FUNC,
+  EXPAND_EXPRESSION,
+  EXPAND_MENUNAMES,
+  EXPAND_USER_COMMANDS,
+  EXPAND_USER_CMD_FLAGS,
+  EXPAND_USER_NARGS,
+  EXPAND_USER_COMPLETE,
+  EXPAND_ENV_VARS,
+  EXPAND_LANGUAGE,
+  EXPAND_COLORS,
+  EXPAND_COMPILER,
+  EXPAND_USER_DEFINED,
+  EXPAND_USER_LIST,
+  EXPAND_SHELLCMD,
+  EXPAND_CSCOPE,
+  EXPAND_SIGN,
+  EXPAND_PROFILE,
+  EXPAND_BEHAVE,
+  EXPAND_FILETYPE,
+  EXPAND_FILES_IN_PATH,
+  EXPAND_OWNSYNTAX,
+  EXPAND_LOCALES,
+  EXPAND_HISTORY,
+  EXPAND_USER,
+  EXPAND_SYNTIME,
+};
 
 /* Values for exmode_active (0 is no exmode) */
-#define EXMODE_NORMAL           1
-#define EXMODE_VIM              2
+enum ExModes {
+  EXMODE_NORMAL = 1,
+  EXMODE_VIM
+};
 
 /* Values for nextwild() and ExpandOne().  See ExpandOne() for meaning. */
-#define WILD_FREE               1
-#define WILD_EXPAND_FREE        2
-#define WILD_EXPAND_KEEP        3
-#define WILD_NEXT               4
-#define WILD_PREV               5
-#define WILD_ALL                6
-#define WILD_LONGEST            7
-#define WILD_ALL_KEEP           8
+enum WildMode {
+  WILD_FREE = 1,
+  WILD_EXPAND_FREE,
+  WILD_EXPAND_KEEP,
+  WILD_NEXT,
+  WILD_PREV,
+  WILD_ALL,
+  WILD_LONGEST,
+  WILD_ALL_KEEP,
+};
 
-#define WILD_LIST_NOTFOUND      1
-#define WILD_HOME_REPLACE       2
-#define WILD_USE_NL             4
-#define WILD_NO_BEEP            8
-#define WILD_ADD_SLASH          16
-#define WILD_KEEP_ALL           32
-#define WILD_SILENT             64
-#define WILD_ESCAPE             128
-#define WILD_ICASE              256
+enum WildOption {
+  WILD_LIST_NOTFOUND = 1,
+  WILD_HOME_REPLACE  = 2,
+  WILD_USE_NL        = 4,
+  WILD_NO_BEEP       = 8,
+  WILD_ADD_SLASH     = 16,
+  WILD_KEEP_ALL      = 32,
+  WILD_SILENT        = 64,
+  WILD_ESCAPE        = 128,
+  WILD_ICASE         = 256
+};
 
 /* Flags for expand_wildcards() */
-#define EW_DIR          0x01    /* include directory names */
-#define EW_FILE         0x02    /* include file names */
-#define EW_NOTFOUND     0x04    /* include not found names */
-#define EW_ADDSLASH     0x08    /* append slash to directory name */
-#define EW_KEEPALL      0x10    /* keep all matches */
-#define EW_SILENT       0x20    /* don't print "1 returned" from shell */
-#define EW_EXEC         0x40    /* executable files */
-#define EW_PATH         0x80    /* search in 'path' too */
-#define EW_ICASE        0x100   /* ignore case */
-#define EW_NOERROR      0x200   /* no error for bad regexp */
-#define EW_NOTWILD      0x400   /* add match with literal name if exists */
+enum EwFlag {
+  EW_DIR          = 0x01,    /* include directory names */
+  EW_FILE         = 0x02,    /* include file names */
+  EW_NOTFOUND     = 0x04,    /* include not found names */
+  EW_ADDSLASH     = 0x08,    /* append slash to directory name */
+  EW_KEEPALL      = 0x10,    /* keep all matches */
+  EW_SILENT       = 0x20,    /* don't print "1 returned" from shell */
+  EW_EXEC         = 0x40,    /* executable files */
+  EW_PATH         = 0x80,    /* search in 'path' too */
+  EW_ICASE        = 0x100,   /* ignore case */
+  EW_NOERROR      = 0x200,   /* no error for bad regexp */
+  EW_NOTWILD      = 0x400   /* add match with literal name if exists */
+};
 /* Note: mostly EW_NOTFOUND and EW_SILENT are mutually exclusive: EW_NOTFOUND
 * is used when executing commands and EW_SILENT for interactive expanding. */
 
 /* Flags for find_file_*() functions. */
-#define FINDFILE_FILE   0       /* only files */
-#define FINDFILE_DIR    1       /* only directories */
-#define FINDFILE_BOTH   2       /* files and directories */
+enum FindFileOption {
+  FINDFILE_FILE,       /* only files */
+  FINDFILE_DIR,        /* only directories */
+  FINDFILE_BOTH        /* files and directories */
+};
 
-# define W_WINCOL(wp)   (wp->w_wincol)
-# define W_WIDTH(wp)    (wp->w_width)
-# define W_ENDCOL(wp)   (wp->w_wincol + wp->w_width)
-# define W_VSEP_WIDTH(wp) (wp->w_vsep_width)
-# define W_STATUS_HEIGHT(wp) (wp->w_status_height)
-# define W_WINROW(wp)   (wp->w_winrow)
+#define W_WINCOL(wp)   (wp->w_wincol)
+#define W_WIDTH(wp)    (wp->w_width)
+#define W_ENDCOL(wp)   (wp->w_wincol + wp->w_width)
+#define W_VSEP_WIDTH(wp) (wp->w_vsep_width)
+#define W_STATUS_HEIGHT(wp) (wp->w_status_height)
+#define W_WINROW(wp)   (wp->w_winrow)
 
 #ifdef NO_EXPANDPATH
 # define gen_expand_wildcards mch_expand_wildcards
 #endif
 
 /* Values for the find_pattern_in_path() function args 'type' and 'action': */
-#define FIND_ANY        1
-#define FIND_DEFINE     2
-#define CHECK_PATH      3
+enum FindPatternType {
+  FIND_ANY = 1,
+  FIND_DEFINE,
+  CHECK_PATH
+};
 
-#define ACTION_SHOW     1
-#define ACTION_GOTO     2
-#define ACTION_SPLIT    3
-#define ACTION_SHOW_ALL 4
-# define ACTION_EXPAND  5
+enum FindPatternAction {
+  ACTION_SHOW = 1,
+  ACTION_GOTO,
+  ACTION_SPLIT,
+  ACTION_SHOW_ALL,
+  ACTION_EXPAND
+};
 
 # define SST_MIN_ENTRIES 150    /* minimal size for state stack array */
 #  define SST_MAX_ENTRIES 1000  /* maximal size for state stack array */
@@ -454,25 +478,27 @@ typedef unsigned long u8char_T;     /* long should be 32 bits or more */
 # define SST_DIST        16     /* normal distance between entries */
 # define SST_INVALID    (synstate_T *)-1        /* invalid syn_state pointer */
 
-# define HL_CONTAINED   0x01    /* not used on toplevel */
-# define HL_TRANSP      0x02    /* has no highlighting	*/
-# define HL_ONELINE     0x04    /* match within one line only */
-# define HL_HAS_EOL     0x08    /* end pattern that matches with $ */
-# define HL_SYNC_HERE   0x10    /* sync point after this item (syncing only) */
-# define HL_SYNC_THERE  0x20    /* sync point at current line (syncing only) */
-# define HL_MATCH       0x40    /* use match ID instead of item ID */
-# define HL_SKIPNL      0x80    /* nextgroup can skip newlines */
-# define HL_SKIPWHITE   0x100   /* nextgroup can skip white space */
-# define HL_SKIPEMPTY   0x200   /* nextgroup can skip empty lines */
-# define HL_KEEPEND     0x400   /* end match always kept */
-# define HL_EXCLUDENL   0x800   /* exclude NL from match */
-# define HL_DISPLAY     0x1000  /* only used for displaying, not syncing */
-# define HL_FOLD        0x2000  /* define fold */
-# define HL_EXTEND      0x4000  /* ignore a keepend */
-# define HL_MATCHCONT   0x8000  /* match continued from previous line */
-# define HL_TRANS_CONT  0x10000 /* transparent item without contains arg */
-# define HL_CONCEAL     0x20000 /* can be concealed */
-# define HL_CONCEALENDS 0x40000 /* can be concealed */
+enum HlFlag {
+  HL_CONTAINED   = 0x01,    /* not used on toplevel */
+  HL_TRANSP      = 0x02,    /* has no highlighting	*/
+  HL_ONELINE     = 0x04,    /* match within one line only */
+  HL_HAS_EOL     = 0x08,    /* end pattern that matches with $ */
+  HL_SYNC_HERE   = 0x10,    /* sync point after this item (syncing only) */
+  HL_SYNC_THERE  = 0x20,    /* sync point at current line (syncing only) */
+  HL_MATCH       = 0x40,    /* use match ID instead of item ID */
+  HL_SKIPNL      = 0x80,    /* nextgroup can skip newlines */
+  HL_SKIPWHITE   = 0x100,   /* nextgroup can skip white space */
+  HL_SKIPEMPTY   = 0x200,   /* nextgroup can skip empty lines */
+  HL_KEEPEND     = 0x400,   /* end match always kept */
+  HL_EXCLUDENL   = 0x800,   /* exclude NL from match */
+  HL_DISPLAY     = 0x1000,  /* only used for displaying, not syncing */
+  HL_FOLD        = 0x2000,  /* define fold */
+  HL_EXTEND      = 0x4000,  /* ignore a keepend */
+  HL_MATCHCONT   = 0x8000,  /* match continued from previous line */
+  HL_TRANS_CONT  = 0x10000, /* transparent item without contains arg */
+  HL_CONCEAL     = 0x20000, /* can be concealed */
+  HL_CONCEALENDS = 0x40000 /* can be concealed */
+};
 
 /* Values for 'options' argument in do_search() and searchit() */
 #define SEARCH_REV    0x01  /* go in reverse of previous dir. */
@@ -661,12 +687,14 @@ typedef unsigned long u8char_T;     /* long should be 32 bits or more */
 /*
  * There are four history tables:
  */
-#define HIST_CMD        0       /* colon commands */
-#define HIST_SEARCH     1       /* search commands */
-#define HIST_EXPR       2       /* expressions (from entering = register) */
-#define HIST_INPUT      3       /* input() lines */
-#define HIST_DEBUG      4       /* debug commands */
-#define HIST_COUNT      5       /* number of history tables */
+enum HistoryTable {
+  HIST_CMD,               /* colon commands */
+  HIST_SEARCH,            /* search commands */
+  HIST_EXPR,              /* expressions (from entering = register) */
+  HIST_INPUT,             /* input() lines */
+  HIST_DEBUG,             /* debug commands */
+  HIST_COUNT              /* number of history tables */
+};
 
 /*
  * Flags for chartab[].
@@ -679,18 +707,20 @@ typedef unsigned long u8char_T;     /* long should be 32 bits or more */
 /*
  * Values for do_tag().
  */
-#define DT_TAG          1       /* jump to newer position or same tag again */
-#define DT_POP          2       /* jump to older position */
-#define DT_NEXT         3       /* jump to next match of same tag */
-#define DT_PREV         4       /* jump to previous match of same tag */
-#define DT_FIRST        5       /* jump to first match of same tag */
-#define DT_LAST         6       /* jump to first match of same tag */
-#define DT_SELECT       7       /* jump to selection from list */
-#define DT_HELP         8       /* like DT_TAG, but no wildcards */
-#define DT_JUMP         9       /* jump to new tag or selection from list */
-#define DT_CSCOPE       10      /* cscope find command (like tjump) */
-#define DT_LTAG         11      /* tag using location list */
-#define DT_FREE         99      /* free cached matches */
+enum DoTag {
+  DT_TAG,                  /* jump to newer position or same tag again */
+  DT_POP,                  /* jump to older position */
+  DT_NEXT,                 /* jump to next match of same tag */
+  DT_PREV,                 /* jump to previous match of same tag */
+  DT_FIRST,                /* jump to first match of same tag */
+  DT_LAST,                 /* jump to first match of same tag */
+  DT_SELECT,               /* jump to selection from list */
+  DT_HELP,                 /* like DT_TAG, but no wildcards */
+  DT_JUMP,                 /* jump to new tag or selection from list */
+  DT_CSCOPE,               /* cscope find command (like tjump) */
+  DT_LTAG,                 /* tag using location list */
+  DT_FREE = 99             /* free cached matches */
+};
 
 /*
  * flags for find_tags().
@@ -967,43 +997,47 @@ typedef UINT32_TYPEDEF UINT32_T;
 /*
  * Operator IDs; The order must correspond to opchars[] in ops.c!
  */
-#define OP_NOP          0       /* no pending operation */
-#define OP_DELETE       1       /* "d"  delete operator */
-#define OP_YANK         2       /* "y"  yank operator */
-#define OP_CHANGE       3       /* "c"  change operator */
-#define OP_LSHIFT       4       /* "<"  left shift operator */
-#define OP_RSHIFT       5       /* ">"  right shift operator */
-#define OP_FILTER       6       /* "!"  filter operator */
-#define OP_TILDE        7       /* "g~" switch case operator */
-#define OP_INDENT       8       /* "="  indent operator */
-#define OP_FORMAT       9       /* "gq" format operator */
-#define OP_COLON        10      /* ":"  colon operator */
-#define OP_UPPER        11      /* "gU" make upper case operator */
-#define OP_LOWER        12      /* "gu" make lower case operator */
-#define OP_JOIN         13      /* "J"  join operator, only for Visual mode */
-#define OP_JOIN_NS      14      /* "gJ"  join operator, only for Visual mode */
-#define OP_ROT13        15      /* "g?" rot-13 encoding */
-#define OP_REPLACE      16      /* "r"  replace chars, only for Visual mode */
-#define OP_INSERT       17      /* "I"  Insert column, only for Visual mode */
-#define OP_APPEND       18      /* "A"  Append column, only for Visual mode */
-#define OP_FOLD         19      /* "zf" define a fold */
-#define OP_FOLDOPEN     20      /* "zo" open folds */
-#define OP_FOLDOPENREC  21      /* "zO" open folds recursively */
-#define OP_FOLDCLOSE    22      /* "zc" close folds */
-#define OP_FOLDCLOSEREC 23      /* "zC" close folds recursively */
-#define OP_FOLDDEL      24      /* "zd" delete folds */
-#define OP_FOLDDELREC   25      /* "zD" delete folds recursively */
-#define OP_FORMAT2      26      /* "gw" format operator, keeps cursor pos */
-#define OP_FUNCTION     27      /* "g@" call 'operatorfunc' */
+enum OperatorId {
+  OP_NOP,               /* no pending operation */
+  OP_DELETE,            /* "d"  delete operator */
+  OP_YANK,              /* "y"  yank operator */
+  OP_CHANGE,            /* "c"  change operator */
+  OP_LSHIFT,            /* "<"  left shift operator */
+  OP_RSHIFT,            /* ">"  right shift operator */
+  OP_FILTER,            /* "!"  filter operator */
+  OP_TILDE,             /* "g~" switch case operator */
+  OP_INDENT,            /* "="  indent operator */
+  OP_FORMAT,            /* "gq" format operator */
+  OP_COLON,             /* ":"  colon operator */
+  OP_UPPER,             /* "gU" make upper case operator */
+  OP_LOWER,             /* "gu" make lower case operator */
+  OP_JOIN,              /* "J"  join operator, only for Visual mode */
+  OP_JOIN_NS,           /* "gJ"  join operator, only for Visual mode */
+  OP_ROT13,             /* "g?" rot-13 encoding */
+  OP_REPLACE,           /* "r"  replace chars, only for Visual mode */
+  OP_INSERT,            /* "I"  Insert column, only for Visual mode */
+  OP_APPEND,            /* "A"  Append column, only for Visual mode */
+  OP_FOLD,              /* "zf" define a fold */
+  OP_FOLDOPEN,          /* "zo" open folds */
+  OP_FOLDOPENREC,       /* "zO" open folds recursively */
+  OP_FOLDCLOSE,         /* "zc" close folds */
+  OP_FOLDCLOSEREC,      /* "zC" close folds recursively */
+  OP_FOLDDEL,           /* "zd" delete folds */
+  OP_FOLDDELREC,        /* "zD" delete folds recursively */
+  OP_FORMAT2,           /* "gw" format operator, keeps cursor pos */
+  OP_FUNCTION           /* "g@" call 'operatorfunc' */
+};
 
 /*
  * Motion types, used for operators and for yank/delete registers.
  */
-#define MCHAR   0               /* character-wise movement/register */
-#define MLINE   1               /* line-wise movement/register */
-#define MBLOCK  2               /* block-wise register */
+enum MotionType {
+  MCHAR,                  /* character-wise movement/register */
+  MLINE,                  /* line-wise movement/register */
+  MBLOCK,                 /* block-wise register */
 
-#define MAUTO   0xff            /* Decide between MLINE/MCHAR */
+  MAUTO = 0xff            /* Decide between MLINE/MCHAR */
+};
 
 /*
  * Minimum screen size
@@ -1358,67 +1392,68 @@ typedef struct timeval proftime_T;
 #define VALID_HEAD              2
 
 /* Defines for Vim variables.  These must match vimvars[] in eval.c! */
-#define VV_COUNT        0
-#define VV_COUNT1       1
-#define VV_PREVCOUNT    2
-#define VV_ERRMSG       3
-#define VV_WARNINGMSG   4
-#define VV_STATUSMSG    5
-#define VV_SHELL_ERROR  6
-#define VV_THIS_SESSION 7
-#define VV_VERSION      8
-#define VV_LNUM         9
-#define VV_TERMRESPONSE 10
-#define VV_FNAME        11
-#define VV_LANG         12
-#define VV_LC_TIME      13
-#define VV_CTYPE        14
-#define VV_CC_FROM      15
-#define VV_CC_TO        16
-#define VV_FNAME_IN     17
-#define VV_FNAME_OUT    18
-#define VV_FNAME_NEW    19
-#define VV_FNAME_DIFF   20
-#define VV_CMDARG       21
-#define VV_FOLDSTART    22
-#define VV_FOLDEND      23
-#define VV_FOLDDASHES   24
-#define VV_FOLDLEVEL    25
-#define VV_PROGNAME     26
-#define VV_SEND_SERVER  27
-#define VV_DYING        28
-#define VV_EXCEPTION    29
-#define VV_THROWPOINT   30
-#define VV_REG          31
-#define VV_CMDBANG      32
-#define VV_INSERTMODE   33
-#define VV_VAL          34
-#define VV_KEY          35
-#define VV_PROFILING    36
-#define VV_FCS_REASON   37
-#define VV_FCS_CHOICE   38
-#define VV_BEVAL_BUFNR  39
-#define VV_BEVAL_WINNR  40
-#define VV_BEVAL_LNUM   41
-#define VV_BEVAL_COL    42
-#define VV_BEVAL_TEXT   43
-#define VV_SCROLLSTART  44
-#define VV_SWAPNAME     45
-#define VV_SWAPCHOICE   46
-#define VV_SWAPCOMMAND  47
-#define VV_CHAR         48
-#define VV_MOUSE_WIN    49
-#define VV_MOUSE_LNUM   50
-#define VV_MOUSE_COL    51
-#define VV_OP           52
-#define VV_SEARCHFORWARD 53
-#define VV_HLSEARCH     54
-#define VV_OLDFILES     55
-#define VV_WINDOWID     56
-#define VV_LEN          57      /* number of v: vars */
+enum VimVariable {
+  VV_COUNT,
+  VV_COUNT1,
+  VV_PREVCOUNT,
+  VV_ERRMSG,
+  VV_WARNINGMSG,
+  VV_STATUSMSG,
+  VV_SHELL_ERROR,
+  VV_THIS_SESSION,
+  VV_VERSION,
+  VV_LNUM,
+  VV_TERMRESPONSE,
+  VV_FNAME,
+  VV_LANG,
+  VV_LC_TIME,
+  VV_CTYPE,
+  VV_CC_FROM,
+  VV_CC_TO,
+  VV_FNAME_IN,
+  VV_FNAME_OUT,
+  VV_FNAME_NEW,
+  VV_FNAME_DIFF,
+  VV_CMDARG,
+  VV_FOLDSTART,
+  VV_FOLDEND,
+  VV_FOLDDASHES,
+  VV_FOLDLEVEL,
+  VV_PROGNAME,
+  VV_SEND_SERVER,
+  VV_DYING,
+  VV_EXCEPTION,
+  VV_THROWPOINT,
+  VV_REG,
+  VV_CMDBANG,
+  VV_INSERTMODE,
+  VV_VAL,
+  VV_KEY,
+  VV_PROFILING,
+  VV_FCS_REASON,
+  VV_FCS_CHOICE,
+  VV_BEVAL_BUFNR,
+  VV_BEVAL_WINNR,
+  VV_BEVAL_LNUM,
+  VV_BEVAL_COL,
+  VV_BEVAL_TEXT,
+  VV_SCROLLSTART,
+  VV_SWAPNAME,
+  VV_SWAPCHOICE,
+  VV_SWAPCOMMAND,
+  VV_CHAR,
+  VV_MOUSE_WIN,
+  VV_MOUSE_LNUM,
+  VV_MOUSE_COL,
+  VV_OP,
+  VV_SEARCHFORWARD,
+  VV_HLSEARCH,
+  VV_OLDFILES,
+  VV_WINDOWID,
+  VV_LEN            /* number of v: vars */
+};
 
 typedef int VimClipboard;       /* This is required for the prototypes. */
-
 
 #include "ex_cmds.h"        /* Ex command defines */
 #include "proto.h"          /* function prototypes */
@@ -1436,12 +1471,7 @@ typedef int VimClipboard;       /* This is required for the prototypes. */
 # define USE_MCH_ERRMSG
 #endif
 
-
-
-
 #include "globals.h"        /* global variables and messages */
-
-
 
 /*
  * If console dialog not supported, but GUI dialog is, use the GUI one.
@@ -1456,7 +1486,6 @@ typedef int VimClipboard;       /* This is required for the prototypes. */
  */
 
 /* stop using fastcall for Borland */
-
 
 /* Note: a NULL argument for vim_realloc() is not portable, don't use it. */
 #if defined(MEM_PROFILE)
@@ -1526,13 +1555,10 @@ typedef int VimClipboard;       /* This is required for the prototypes. */
 #define SIGN_BYTE 1         /* byte value used where sign is displayed;
                                attribute value is sign type */
 
-
 #  define X_DISPLAY     xterm_dpy
-
 
 # undef NBDEBUG
 # define nbdebug(a)
-
 
 /* values for vim_handle_signal() that are not a signal */
 #define SIGNAL_BLOCK    -1

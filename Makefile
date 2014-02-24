@@ -1,5 +1,7 @@
 CMAKE_FLAGS := -DCMAKE_BUILD_TYPE=Debug
 
+BIN_DIR=build/src
+
 build/src/vim: deps
 	cd build && make
 
